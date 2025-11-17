@@ -1,0 +1,91 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+
+html, body {
+  font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  background: linear-gradient(135deg, #2d5a42 0%, #1e3a2e 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  margin: 0;
+  padding: 0;
+}
+
+@layer components {
+  .chalkboard-card {
+    @apply shadow-2xl rounded-lg border-4;
+    padding: 1rem;
+    background: linear-gradient(135deg, #2f5a43 0%, #234635 100%);
+    border-color: #1a3428;
+    background-image:
+      linear-gradient(0deg, transparent 24%, rgba(255, 255, 255, .08) 25%, rgba(255, 255, 255, .08) 26%, transparent 27%, transparent 74%, rgba(255, 255, 255, .08) 75%, rgba(255, 255, 255, .08) 76%, transparent 77%, transparent),
+      linear-gradient(90deg, transparent 24%, rgba(255, 255, 255, .08) 25%, rgba(255, 255, 255, .08) 26%, transparent 27%, transparent 74%, rgba(255, 255, 255, .08) 75%, rgba(255, 255, 255, .08) 76%, transparent 77%, transparent);
+    background-size: 50px 50px;
+  }
+
+  .chalk-text {
+    @apply text-white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+
+  .btn-chalk {
+    @apply px-4 py-2 md:px-6 md:py-3 rounded-lg font-bold text-lg transition-all duration-200 transform hover:scale-105 active:scale-95;
+    @apply shadow-lg;
+    background: #ffd93d;
+    color: #1a3428;
+    border: 3px solid #ffb700;
+  }
+
+  @media (min-width: 768px) {
+    .chalkboard-card {
+      padding: 2rem;
+    }
+  }
+
+  .btn-chalk:hover {
+    background: #ffed4e;
+    box-shadow: 0 0 20px rgba(255, 217, 61, 0.6);
+  }
+
+  .input-chalk {
+    @apply w-full px-4 py-3 rounded-lg text-xl font-bold text-center;
+    @apply focus:outline-none focus:ring-4;
+    background: #ffffff;
+    color: #1a3428;
+    border: 4px solid #1a3428;
+  }
+
+  .input-chalk:focus {
+    border-color: #ffd93d;
+    box-shadow: 0 0 0 4px rgba(255, 217, 61, 0.3);
+  }
+
+  .input-chalk:disabled {
+    background: #e0e0e0;
+    color: #666;
+    cursor: not-allowed;
+  }
+
+  .checkbox-container {
+    @apply flex items-center gap-3 p-4 rounded-lg cursor-pointer;
+    @apply transition-colors duration-200;
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .checkbox-container:hover {
+    background: rgba(255, 255, 255, 0.15);
+  }
+
+  .checkbox-chalk {
+    @apply w-8 h-8 rounded cursor-pointer;
+    accent-color: #ffd93d;
+  }
+}
