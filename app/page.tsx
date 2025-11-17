@@ -447,7 +447,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="space-y-2 max-h-[40vh] overflow-y-auto pr-1">
+            <div className="space-y-2">
               {problems.map((problem, index) => (
                 <label
                   key={index}

@@ -38,13 +38,13 @@ html, body {
     'Ubuntu', 'Cantarell', 'Helvetica Neue', Arial, sans-serif;
   background: #000000;
   min-height: 100vh;
-  height: 100vh;
-  overflow: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   margin: 0;
   padding: 0;
   touch-action: pan-y;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 @layer components {
