@@ -449,9 +449,10 @@ export default function Home() {
 
             <div className="space-y-2 max-h-[40vh] overflow-y-auto pr-1">
               {problems.map((problem, index) => (
-                <div
+                <label
                   key={index}
-                  className={`result-card ${
+                  htmlFor={`answer-${index}`}
+                  className={`result-card cursor-pointer block ${
                     problem.isCorrect
                       ? 'result-card-correct'
                       : 'result-card-incorrect'
@@ -463,6 +464,7 @@ export default function Home() {
                       {problem.num2} ={' '}
                       {!problem.isCorrect ? (
                         <input
+                          id={`answer-${index}`}
                           type="number"
                           inputMode="numeric"
                           pattern="[0-9]*"
@@ -481,7 +483,7 @@ export default function Home() {
                       {problem.isCorrect ? '✓' : '✗'}
                     </div>
                   </div>
-                </div>
+                </label>
               ))}
             </div>
 
