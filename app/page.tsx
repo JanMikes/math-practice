@@ -30,6 +30,9 @@ export default function Home() {
     maxNumber: 20,
     problemCount: 10,
   });
+  const [minNumberInput, setMinNumberInput] = useState('1');
+  const [maxNumberInput, setMaxNumberInput] = useState('20');
+  const [problemCountInput, setProblemCountInput] = useState('10');
   const [problems, setProblems] = useState<Problem[]>([]);
   const [currentProblemIndex, setCurrentProblemIndex] = useState(0);
   const [currentAnswer, setCurrentAnswer] = useState('');
@@ -58,7 +61,11 @@ export default function Home() {
       }
 
       if (savedSettings) {
-        setSettings(JSON.parse(savedSettings));
+        const loaded = JSON.parse(savedSettings);
+        setSettings(loaded);
+        setMinNumberInput(loaded.minNumber.toString());
+        setMaxNumberInput(loaded.maxNumber.toString());
+        setProblemCountInput(loaded.problemCount.toString());
       }
     }
   }, []);
@@ -145,18 +152,37 @@ export default function Home() {
       return;
     }
 
-    if (settings.minNumber < 0 || settings.maxNumber > 100 || settings.minNumber >= settings.maxNumber) {
+    const minNum = parseInt(minNumberInput);
+    const maxNum = parseInt(maxNumberInput);
+    const problemCount = parseInt(problemCountInput);
+
+    if (!minNumberInput || !maxNumberInput || !problemCountInput ||
+        isNaN(minNum) || isNaN(maxNum) || isNaN(problemCount)) {
+      alert('Vyplň všechna pole!');
+      return;
+    }
+
+    if (minNum < 0 || maxNum > 100 || minNum >= maxNum) {
       alert('Zkontroluj rozsah čísel!');
       return;
     }
 
-    if (settings.problemCount < 1 || settings.problemCount > 50) {
+    if (problemCount < 1 || problemCount > 50) {
       alert('Počet příkladů musí být mezi 1 a 50!');
       return;
     }
 
-    const newProblems = Array.from({ length: settings.problemCount }, () =>
-      generateProblem(settings.operations, settings.minNumber, settings.maxNumber)
+    // Update settings with parsed values
+    const newSettings = {
+      ...settings,
+      minNumber: minNum,
+      maxNumber: maxNum,
+      problemCount: problemCount,
+    };
+    setSettings(newSettings);
+
+    const newProblems = Array.from({ length: problemCount }, () =>
+      generateProblem(settings.operations, minNum, maxNum)
     );
 
     setProblems(newProblems);
@@ -209,6 +235,9 @@ export default function Home() {
     setCurrentProblemIndex(0);
     setCurrentAnswer('');
     setLastAnswerSubmitted(false);
+    setMinNumberInput(settings.minNumber.toString());
+    setMaxNumberInput(settings.maxNumber.toString());
+    setProblemCountInput(settings.problemCount.toString());
     if (typeof window !== 'undefined') {
       localStorage.removeItem('mathProblems');
     }
@@ -289,10 +318,8 @@ export default function Home() {
                   inputMode="numeric"
                   pattern="[0-9]*"
                   className="input-chalk text-lg sm:text-xl"
-                  value={settings.minNumber}
-                  onChange={(e) =>
-                    setSettings({ ...settings, minNumber: parseInt(e.target.value) || 0 })
-                  }
+                  value={minNumberInput}
+                  onChange={(e) => setMinNumberInput(e.target.value)}
                   min="0"
                   max="99"
                 />
@@ -306,10 +333,8 @@ export default function Home() {
                   inputMode="numeric"
                   pattern="[0-9]*"
                   className="input-chalk text-lg sm:text-xl"
-                  value={settings.maxNumber}
-                  onChange={(e) =>
-                    setSettings({ ...settings, maxNumber: parseInt(e.target.value) || 1 })
-                  }
+                  value={maxNumberInput}
+                  onChange={(e) => setMaxNumberInput(e.target.value)}
                   min="1"
                   max="100"
                 />
@@ -325,10 +350,8 @@ export default function Home() {
                 inputMode="numeric"
                 pattern="[0-9]*"
                 className="input-chalk text-lg sm:text-xl"
-                value={settings.problemCount}
-                onChange={(e) =>
-                  setSettings({ ...settings, problemCount: parseInt(e.target.value) || 1 })
-                }
+                value={problemCountInput}
+                onChange={(e) => setProblemCountInput(e.target.value)}
                 min="1"
                 max="50"
               />
