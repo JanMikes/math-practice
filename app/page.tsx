@@ -251,7 +251,7 @@ export default function Home() {
   const hasIncorrect = correctCount < totalCount;
 
   return (
-    <div className="min-h-screen h-screen flex justify-center p-2 sm:p-3">
+    <div className="flex justify-center p-2 sm:p-3">
       <div className="chalkboard-card max-w-2xl w-full h-fit">
 
         {screen === 'setup' && (
