@@ -104,6 +104,39 @@ Pokud aplikace nefunguje správně:
    ```
 3. Vymažte localStorage v prohlížeči (F12 → Application → Local Storage → Clear)
 
+## 🚀 Deployment na GitHub Pages
+
+Aplikace je nakonfigurována pro automatické nasazení na GitHub Pages.
+
+### Nastavení v GitHub repozitáři
+
+1. **Aktivujte GitHub Pages**:
+   - Jděte do Settings → Pages
+   - V sekci "Build and deployment":
+     - Source: GitHub Actions
+
+2. **Push do repozitáře**:
+   ```bash
+   git add .
+   git commit -m "Configure for static export and GitHub Pages"
+   git push origin main
+   ```
+
+3. **Automatické nasazení**:
+   - GitHub Actions workflow se spustí automaticky při push do `main` větve
+   - Build zabere ~1-2 minuty
+   - Aplikace bude dostupná na: `https://<username>.github.io/<repository>/`
+   - Pokud máte CNAME soubor (vlastní doména), bude dostupná na vaší doméně
+
+### Manuální build
+
+Pro lokální testování statického buildu:
+```bash
+docker compose exec math-app sh -c "NODE_ENV=production npm run build"
+```
+
+Statické soubory najdete v adresáři `out/`.
+
 ## 📄 Licence
 
 Vytvořeno pro vzdělávací účely.
