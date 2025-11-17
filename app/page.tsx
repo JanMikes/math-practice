@@ -33,7 +33,6 @@ export default function Home() {
   const [problems, setProblems] = useState<Problem[]>([]);
   const [currentProblemIndex, setCurrentProblemIndex] = useState(0);
   const [currentAnswer, setCurrentAnswer] = useState('');
-  const [correctionMode, setCorrectionMode] = useState(false);
   const [lastAnswerSubmitted, setLastAnswerSubmitted] = useState(false);
 
   // Save to localStorage
@@ -179,17 +178,20 @@ export default function Home() {
       userAnswerNum === updatedProblems[currentProblemIndex].correctAnswer;
 
     setProblems(updatedProblems);
-    setLastAnswerSubmitted(true);
-  };
 
-  const handleNextProblem = () => {
+    // For non-last problems, immediately go to next
     if (currentProblemIndex < problems.length - 1) {
       setCurrentProblemIndex(currentProblemIndex + 1);
       setCurrentAnswer('');
       setLastAnswerSubmitted(false);
     } else {
-      setScreen('results');
+      // For last problem, show submit button
+      setLastAnswerSubmitted(true);
     }
+  };
+
+  const handleNextProblem = () => {
+    setScreen('results');
   };
 
   const handleCorrection = (index: number, newAnswer: string) => {
@@ -206,23 +208,10 @@ export default function Home() {
     setProblems([]);
     setCurrentProblemIndex(0);
     setCurrentAnswer('');
-    setCorrectionMode(false);
     setLastAnswerSubmitted(false);
     if (typeof window !== 'undefined') {
       localStorage.removeItem('mathProblems');
     }
-  };
-
-  const retryIncorrect = () => {
-    const incorrectProblems = problems.filter(p => !p.isCorrect);
-    incorrectProblems.forEach(p => {
-      p.userAnswer = '';
-      p.isCorrect = null;
-    });
-    setProblems(incorrectProblems);
-    setCurrentProblemIndex(0);
-    setCurrentAnswer('');
-    setScreen('exercise');
   };
 
   const getOperationSymbol = (op: Operation): string => {
@@ -259,20 +248,21 @@ export default function Home() {
 
   const correctCount = problems.filter(p => p.isCorrect).length;
   const totalCount = problems.length;
+  const hasIncorrect = correctCount < totalCount;
 
   return (
-    <div className="min-h-screen h-screen flex items-center justify-center p-4 overflow-hidden">
-      <div className="chalkboard-card max-w-2xl w-full max-h-[calc(100vh-2rem)] overflow-y-auto">
+    <div className="min-h-screen h-screen flex justify-center p-2 sm:p-3">
+      <div className="chalkboard-card max-w-2xl w-full h-fit">
 
         {screen === 'setup' && (
-          <div className="space-y-4">
-            <h1 className="text-3xl md:text-4xl font-bold text-center chalk-text mb-4">
+          <div className="space-y-3">
+            <h1 className="text-2xl sm:text-3xl font-bold text-center chalk-text mb-2">
               📚 Procvičování matematiky
             </h1>
 
             <div>
-              <h2 className="text-xl md:text-2xl chalk-text mb-3">Co budeme počítat?</h2>
-              <div className="grid grid-cols-2 gap-3">
+              <h2 className="text-lg sm:text-xl chalk-text mb-2">Co budeme počítat?</h2>
+              <div className="grid grid-cols-2 gap-2">
                 {(['+', '-', '*', '/'] as Operation[]).map(op => (
                   <label key={op} className="checkbox-container">
                     <input
@@ -281,7 +271,7 @@ export default function Home() {
                       checked={settings.operations.includes(op)}
                       onChange={() => toggleOperation(op)}
                     />
-                    <span className="text-xl chalk-text font-bold">
+                    <span className="text-base sm:text-lg chalk-text font-bold">
                       {getOperationSymbol(op)} {getOperationName(op)}
                     </span>
                   </label>
@@ -289,16 +279,16 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="block text-lg chalk-text mb-2">
+                <label className="block text-sm sm:text-base chalk-text mb-1">
                   Od čísla:
                 </label>
                 <input
                   type="number"
                   inputMode="numeric"
                   pattern="[0-9]*"
-                  className="input-chalk text-lg"
+                  className="input-chalk text-lg sm:text-xl"
                   value={settings.minNumber}
                   onChange={(e) =>
                     setSettings({ ...settings, minNumber: parseInt(e.target.value) || 0 })
@@ -308,14 +298,14 @@ export default function Home() {
                 />
               </div>
               <div>
-                <label className="block text-lg chalk-text mb-2">
+                <label className="block text-sm sm:text-base chalk-text mb-1">
                   Do čísla:
                 </label>
                 <input
                   type="number"
                   inputMode="numeric"
                   pattern="[0-9]*"
-                  className="input-chalk text-lg"
+                  className="input-chalk text-lg sm:text-xl"
                   value={settings.maxNumber}
                   onChange={(e) =>
                     setSettings({ ...settings, maxNumber: parseInt(e.target.value) || 1 })
@@ -327,14 +317,14 @@ export default function Home() {
             </div>
 
             <div>
-              <label className="block text-lg chalk-text mb-2">
+              <label className="block text-sm sm:text-base chalk-text mb-1">
                 Počet příkladů:
               </label>
               <input
                 type="number"
                 inputMode="numeric"
                 pattern="[0-9]*"
-                className="input-chalk text-lg"
+                className="input-chalk text-lg sm:text-xl"
                 value={settings.problemCount}
                 onChange={(e) =>
                   setSettings({ ...settings, problemCount: parseInt(e.target.value) || 1 })
@@ -345,7 +335,7 @@ export default function Home() {
             </div>
 
             <button
-              className="btn-chalk w-full text-2xl"
+              className="btn-chalk w-full text-base sm:text-lg"
               onClick={startExercise}
             >
               🚀 Začít cvičení
@@ -354,14 +344,14 @@ export default function Home() {
         )}
 
         {screen === 'exercise' && problems[currentProblemIndex] && (
-          <div className="space-y-6 md:space-y-8">
+          <div className="space-y-4 screen-fade-in">
             <div className="text-center">
-              <div className="text-lg md:text-xl chalk-text mb-2">
+              <div className="text-base sm:text-lg chalk-text mb-2">
                 Příklad {currentProblemIndex + 1} z {problems.length}
               </div>
-              <div className="w-full bg-chalkboard-dark rounded-full h-3">
+              <div className="progress-bar">
                 <div
-                  className="bg-chalk-yellow h-3 rounded-full transition-all duration-300"
+                  className="progress-fill"
                   style={{
                     width: `${((currentProblemIndex + 1) / problems.length) * 100}%`,
                   }}
@@ -369,8 +359,8 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="text-center">
-              <div className="text-5xl md:text-6xl chalk-text font-bold mb-6 md:mb-8 py-4 md:py-8">
+            <div key={currentProblemIndex} className="text-center py-4 problem-slide-in">
+              <div className="text-5xl sm:text-6xl chalk-text font-bold mb-6">
                 {problems[currentProblemIndex].num1}{' '}
                 {getOperationSymbol(problems[currentProblemIndex].operation)}{' '}
                 {problems[currentProblemIndex].num2} = ?
@@ -380,7 +370,7 @@ export default function Home() {
                 type="number"
                 inputMode="numeric"
                 pattern="[0-9]*"
-                className="input-chalk text-3xl md:text-4xl mb-4 md:mb-6"
+                className="input-chalk text-3xl sm:text-4xl mb-4"
                 value={currentAnswer}
                 onChange={(e) => setCurrentAnswer(e.target.value)}
                 onKeyPress={(e) => {
@@ -399,17 +389,17 @@ export default function Home() {
 
               {!lastAnswerSubmitted ? (
                 <button
-                  className="btn-chalk w-full text-2xl"
+                  className="btn-chalk w-full text-base sm:text-lg"
                   onClick={handleSubmitAnswer}
                 >
-                  ✓ Zadat výsledek
+                  {currentProblemIndex < problems.length - 1 ? '✓ Zadat a další' : '✓ Zadat výsledek'}
                 </button>
               ) : (
                 <button
-                  className="btn-chalk w-full text-2xl"
+                  className="btn-chalk w-full text-base sm:text-lg"
                   onClick={handleNextProblem}
                 >
-                  {currentProblemIndex < problems.length - 1 ? '➡️ Další příklad' : '🏁 Zkontrolovat výsledky'}
+                  🏁 Zkontrolovat výsledky
                 </button>
               )}
             </div>
@@ -417,60 +407,54 @@ export default function Home() {
         )}
 
         {screen === 'results' && (
-          <div className="space-y-4">
-            <h1 className="text-3xl md:text-4xl font-bold text-center chalk-text mb-2">
-              🎉 Výsledky
+          <div className="space-y-3">
+            <h1 className="text-2xl sm:text-3xl font-bold text-center chalk-text mb-2">
+              {hasIncorrect ? '✏️ Oprav chyby' : '🎉 Výsledky'}
             </h1>
 
-            <div className="text-center">
-              <div className="text-2xl md:text-3xl chalk-text font-bold mb-2">
-                {correctCount} / {totalCount} správně
+            <div className="text-center bg-white bg-opacity-10 rounded-xl p-3">
+              <div className="text-3xl sm:text-4xl chalk-text font-bold mb-1">
+                {correctCount} / {totalCount}
               </div>
-              <div className="text-lg md:text-xl chalk-text">
+              <div className="text-xs sm:text-sm chalk-text mb-2">správně</div>
+              <div className="text-base sm:text-lg chalk-text">
                 {correctCount === totalCount
                   ? '🌟 Výborně! Všechno správně! 🌟'
-                  : correctCount >= totalCount * 0.8
-                  ? '👏 Skvělá práce!'
-                  : correctCount >= totalCount * 0.6
-                  ? '👍 Dobře, ale můžeš to ještě lépe!'
-                  : '💪 Nezapomeň se víc procvičit!'}
+                  : '✏️ Oprav nesprávné odpovědi níže'}
               </div>
             </div>
 
-            <div className="space-y-2 max-h-[40vh] overflow-y-auto">
+            <div className="space-y-2 max-h-[40vh] overflow-y-auto pr-1">
               {problems.map((problem, index) => (
                 <div
                   key={index}
-                  className={`p-3 rounded-lg ${
+                  className={`result-card ${
                     problem.isCorrect
-                      ? 'bg-green-900 bg-opacity-40 border-2 border-chalk-green'
-                      : 'bg-red-900 bg-opacity-40 border-2 border-chalk-red'
+                      ? 'result-card-correct'
+                      : 'result-card-incorrect'
                   }`}
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="text-lg md:text-2xl chalk-text font-bold">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="text-lg sm:text-xl chalk-text font-bold flex-1">
                       {problem.num1} {getOperationSymbol(problem.operation)}{' '}
                       {problem.num2} ={' '}
-                      {correctionMode && !problem.isCorrect ? (
+                      {!problem.isCorrect ? (
                         <input
                           type="number"
                           inputMode="numeric"
                           pattern="[0-9]*"
-                          className="input-chalk w-20 md:w-24 inline-block text-lg md:text-xl"
+                          className="input-chalk w-16 sm:w-20 inline-block text-lg py-1.5"
                           value={problem.userAnswer}
                           onChange={(e) => handleCorrection(index, e.target.value)}
+                          autoFocus={index === problems.findIndex(p => !p.isCorrect)}
                         />
                       ) : (
-                        <span
-                          className={
-                            problem.isCorrect ? 'text-green-400' : 'text-red-400'
-                          }
-                        >
+                        <span className="text-green-300">
                           {problem.userAnswer}
                         </span>
                       )}
                     </div>
-                    <div className={`text-3xl md:text-4xl font-bold ${problem.isCorrect ? 'text-green-400' : 'text-red-400'}`}>
+                    <div className={`text-2xl sm:text-3xl font-bold flex-shrink-0 ${problem.isCorrect ? 'text-green-300' : 'text-red-300'}`}>
                       {problem.isCorrect ? '✓' : '✗'}
                     </div>
                   </div>
@@ -479,36 +463,18 @@ export default function Home() {
             </div>
 
             <div className="space-y-2">
-              {!correctionMode && correctCount < totalCount && (
+              {hasIncorrect ? (
+                <div className="text-center text-sm sm:text-base chalk-text bg-white bg-opacity-10 rounded-lg p-2">
+                  Oprav všechny chyby, aby ses mohl posunout dál
+                </div>
+              ) : (
                 <button
-                  className="btn-chalk w-full text-lg md:text-xl"
-                  onClick={() => setCorrectionMode(true)}
+                  className="btn-chalk w-full text-sm sm:text-base"
+                  onClick={startNewExercise}
                 >
-                  ✏️ Opravit nesprávné odpovědi
+                  🆕 Nové cvičení
                 </button>
               )}
-              {correctionMode && (
-                <button
-                  className="btn-chalk w-full text-lg md:text-xl bg-green-600 hover:bg-green-700"
-                  onClick={() => setCorrectionMode(false)}
-                >
-                  💾 Uložit opravy
-                </button>
-              )}
-              {correctCount < totalCount && (
-                <button
-                  className="btn-chalk w-full text-lg md:text-xl bg-orange-500 hover:bg-orange-600"
-                  onClick={retryIncorrect}
-                >
-                  🔄 Opakovat nesprávné příklady
-                </button>
-              )}
-              <button
-                className="btn-chalk w-full text-lg md:text-xl"
-                onClick={startNewExercise}
-              >
-                🆕 Nové cvičení
-              </button>
             </div>
           </div>
         )}
